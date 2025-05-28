@@ -1,0 +1,21 @@
+#include <stdio.h>
+#include <stdint.h>
+void generateSubkeys(uint64_t key) 
+{
+    uint32_t left = (key >> 28) & 0xFFFFFFF; 
+    uint32_t right = key & 0xFFFFFFF;        
+    uint64_t subkey;
+    for (int i = 0; i < 16; i++) 
+	{
+        left = (left << 1) | (left >> 27);
+        right = (right << 1) | (right >> 27);
+        subkey = ((left & 0xFFFFFFF) << 24) | (right & 0xFFFFFFF);
+        printf("Subkey %d: %016llX\n", i + 1, subkey);
+    }
+}
+int main() 
+{
+    uint64_t key = 0x0123456789ABCDEF; 
+    generateSubkeys(key);
+    return 0;
+}
