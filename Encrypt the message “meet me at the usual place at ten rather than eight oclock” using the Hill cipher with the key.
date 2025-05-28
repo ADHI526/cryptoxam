@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <string.h>
+int main() {
+    char ciphertext[1000];
+    int freq[26] = {0};
+    char english_freq[] = "ETAOINSHRDLCUMWFGYPBVKJXQZ";
+    int i, j, len, top_n;
+    printf("Enter ciphertext : ");
+    scanf("%s", ciphertext);
+    printf("How many top guesses to print? ");
+    scanf("%d", &top_n);
+    len = strlen(ciphertext);
+    for(i = 0; i < len; i++) {
+        if(ciphertext[i] >= 'A' && ciphertext[i] <= 'Z')
+            freq[ciphertext[i] - 'A']++;
+    }
+    int sorted[26];
+    for(i = 0; i < 26; i++) sorted[i] = i;
+    for(i = 0; i < 25; i++) {
+        for(j = i + 1; j < 26; j++) {
+            if(freq[sorted[j]] > freq[sorted[i]]) {
+                int temp = sorted[i];
+                sorted[i] = sorted[j];
+                sorted[j] = temp;
+            }
+        }
+    }
+    printf("\nTop %d possible plaintexts:\n", top_n);
+    for(i = 0; i < top_n; i++) {
+        int key = (sorted[0] - (english_freq[i] - 'A') + 26) % 26;
+        printf("Guess %d (key = %d): ", i+1, key);
+        for(j = 0; j < len; j++) {
+            if(ciphertext[j] >= 'A' && ciphertext[j] <= 'Z') {
+                char p = (ciphertext[j] - 'A' - key + 26) % 26 + 'A';
+                printf("%c", p);
+            } else {
+                printf("%c", ciphertext[j]);
+            }
+        }
+        printf("\n");
+    }
+    return 0;
+}
