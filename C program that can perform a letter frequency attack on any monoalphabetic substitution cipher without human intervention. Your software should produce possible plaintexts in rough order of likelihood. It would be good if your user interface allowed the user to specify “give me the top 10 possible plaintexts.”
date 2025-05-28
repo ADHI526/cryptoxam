@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char ciphertext[10000];
+    char ciphertext_copy[10000];
+    int freq[26];
+    char cipher_freq[26];
+    char english_freq[] = "ETAOINSHRDLCUMWFGYPBVKJXQZ";
+    char mapping[26];
+    int i, j, k, n;
+    char temp;
+
+    for (i = 0; i < 26; i++) {
+        freq[i] = 0;
+        cipher_freq[i] = 'A' + i;
+    }
+
+    printf("Enter ciphertext (only letters will be considered):\n");
+    fgets(ciphertext, 10000, stdin);
+
+    printf("Enter number of top likely plaintexts to display: ");
+    scanf("%d", &n);
+    if (n > 10) n = 10;
+
+    for (i = 0; ciphertext[i] != '\0'; i++) {
+        char ch = ciphertext[i];
+        if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
+            if (ch >= 'a' && ch <= 'z') ch = ch - ('a' - 'A');
+            freq[ch - 'A']++;
+        }
+    }
+
+    for (i = 0; i < 25; i++) {
+        for (j = i + 1; j < 26; j++) {
+            if (freq[j] > freq[i]) {
+                int ftemp = freq[i];
+                freq[i] = freq[j];
+                freq[j] = ftemp;
+
+                temp = cipher_freq[i];
+                cipher_freq[i] = cipher_freq[j];
+                cipher_freq[j] = temp;
+            }
+        }
+    }
+
+    for (k = 0; k < n; k++) {
+        for (i = 0; i < 26; i++) {
+            mapping[i] = '?';
+        }
+
+        for (i = 0; i < 26; i++) {
+            int shift = (i + k) % 26;
+            mapping[cipher_freq[i] - 'A'] = english_freq[shift];
+        }
+
+        for (i = 0; ciphertext[i] != '\0'; i++) {
+            char ch = ciphertext[i];
+            if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
+                int lower = 0;
+                if (ch >= 'a' && ch <= 'z') {
+                    ch = ch - ('a' - 'A');
+                    lower = 1;
+                }
+                char mapped = mapping[ch - 'A'];
+                if (lower) ciphertext_copy[i] = mapped + ('a' - 'A');
+                else ciphertext_copy[i] = mapped;
+            } else {
+                ciphertext_copy[i] = ch;
+            }
+        }
+        ciphertext_copy[i] = '\0';
+
+        printf("\nPossible plaintext %d:\n%s\n", k + 1, ciphertext_copy);
+    }
+
+    return 0;
+}
